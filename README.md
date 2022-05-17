@@ -1,6 +1,6 @@
 # LinkedIn Clone
 
-![LinkedIn Clone Demo](linkedin-demo.mov)
+![LinkedIn Clone Demo](linkedin-demo.gif)
 
 **_Built using React JS, Redux, Firebase & Styled-Components_** within 2 days. 
 
