@@ -17,10 +17,10 @@ const Login = () => {
           <img src="/Images/login-logo.svg" alt="logo" />
         </a>
         <div>
-          <a href="/feed" className="join">
+          <a href="/" className="join">
             Join now
           </a>
-          <a href="/feed" className="login">
+          <a href="/" className="login">
             Sign in
           </a>
         </div>
@@ -59,11 +59,12 @@ const Nav = styled.nav`
     height: 34px;
     @media (max-width: 767px) {
       padding: 0 5px;
+      width: 130px;
     }
   }
   /*___________________________________*/
   & .join {
-    padding: 10px 12px;
+    padding: 10px 10px;
     color: rgba(0, 0, 0, 0.6);
     margin-right: 12px;
     border-radius: 4px;
@@ -97,7 +98,7 @@ const Section = styled.section`
   position: relative;
   display: flex;
   align-content: start;
-  min-height: 700px;
+  max-height: 100vh;
   padding-bottom: 138px;
   padding-top: 40px;
   padding: 60px 0;
@@ -106,8 +107,10 @@ const Section = styled.section`
   max-width: 1128px;
   align-items: center;
   margin: auto;
+  margin-top: 40px;
   @media (max-width: 767px) {
     min-height: 0px;
+    margin-top: 0;
   }
 `;
 /*__________________________________________*/
@@ -134,10 +137,11 @@ const Hero = styled.div`
     top: 0px;
     right: -200px;
     @media (max-width: 767px) {
-      top: 10px;
+      top: 150px;
       right: 50%;
       transform: translateX(50%);
       width: 270px;
+      height: 500px;
     }
   }
 `;

@@ -6,7 +6,7 @@ import Profile from "./Profile";
 
 /*________________________________________________________________________________*/
 
-const Header = (props) => {
+const Header = () => {
   const user = useSelector((state) => state.user.value);
   const [showUser, setShowUser] = useState(false);
 
@@ -118,7 +118,7 @@ const Search = styled.div`
   flex-grow: 1;
   position: relative;
   & > div {
-    max-width: 280px;
+    max-width: 180px;
     input {
       border: none;
       box-shadow: none;
@@ -133,6 +133,12 @@ const Search = styled.div`
       height: 34px;
       border-color: #dce6f1;
       vertical-align: text-top;
+      @media (max-width: 768px) {
+        width: 200px;
+      }
+    }
+    @media (max-width: 768px) {
+      margin-left: 25px;
     }
   }
 `;
