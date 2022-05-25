@@ -43,10 +43,7 @@ const Rightside = (props) => {
         </Recommendation>
       </FollowCard>
       <BannerCard>
-        <img
-          src="https://static-exp1.licdn.com/scds/common/u/images/promo/ads/li_evergreen_jobs_ad_300x250_v1.jpg"
-          alt=""
-        />
+        <img src="/Images/ads.png" alt="" />
       </BannerCard>
     </Container>
   );
@@ -94,6 +91,8 @@ const FeedList = styled.ul`
     & > div {
       display: flex;
       flex-direction: column;
+      text-align: start;
+      gap: 4px;
     }
     button {
       background-color: transparent;

@@ -26,7 +26,8 @@ const Profile = () => {
             height: "55px",
             marginRight: "5px",
           }}
-        ></img>
+          alt="user"
+        />
         <div className="info">
           <h4>{user?.displayName}</h4>
           <p>{user?.email}</p>

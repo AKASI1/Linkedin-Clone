@@ -2,8 +2,7 @@ import { useState, useRef } from "react";
 import { useSelector } from "react-redux";
 import styled from "styled-components";
 import ReactPlayer from "react-player";
-import { db, storage } from "../firebase";
-import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { db } from "../firebase";
 import { collection, addDoc, Timestamp } from "firebase/firestore";
 
 /*________________________________________________________________________________*/
@@ -28,48 +27,10 @@ const PostModel = (props) => {
     setVedio();
   };
 
-  const postArticle = (e) => {
+  const postArticleHandler = (e) => {
     if (e.target === e.currentTarget) {
       if (image || vedio) {
-        // Upload File.
-        const storageRef = ref(
-          storage,
-          image ? `images/${image.name}` : `vedios/${vedio.name}`
-        );
-        const upload = uploadBytesResumable(storageRef, image ? image : vedio);
-
-        // Listen for state changes, errors, and completion.
-        upload.on(
-          "state_changed",
-          (snapshot) => {
-            const progress =
-              (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-            console.log("Upload is " + progress + "% done");
-            if (snapshot.state === "RUNNING") {
-              console.log("Upload is " + progress + "% done");
-            }
-          },
-          (error) => {
-            console.log(error.code);
-          },
-          async () => {
-            console.log("hello");
-            const url = await getDownloadURL(upload.snapshot.ref);
-            // Add to DataBase
-            await addDoc(collection(db, "Articles"), {
-              user: {
-                name: user.displayName,
-                title: user.email,
-                photo: user.photoURL,
-              },
-              date: Timestamp.now(),
-              sharedImage: image ? url : "",
-              sharedVedio: vedio ? url : "",
-              description: text,
-              comments: 0,
-            });
-          }
-        );
+        props.uploadPost({ image, vedio, text });
       } else {
         addDoc(collection(db, "Articles"), {
           user: {
@@ -81,24 +42,9 @@ const PostModel = (props) => {
           sharedImage: "",
           sharedVedio: textURL ? text : "",
           description: text,
-          comments: 0,
+          comments: [],
         });
       }
-      props.addPost((prev) => [
-        ...prev,
-        {
-          user: {
-            name: user.displayName,
-            title: user.email,
-            photo: user.photoURL,
-          },
-          date: Timestamp.now(),
-          sharedImage: image && URL.createObjectURL(image),
-          sharedVedio: vedio ? URL.createObjectURL(vedio) : textURL && text,
-          description: text,
-          comments: 0,
-        },
-      ]);
       reset();
       props.close();
     }
@@ -208,7 +154,7 @@ const PostModel = (props) => {
             <button
               disabled={text.trim() === ""}
               className="post"
-              onClick={(e) => postArticle(e)}
+              onClick={(e) => postArticleHandler(e)}
             >
               Post
             </button>

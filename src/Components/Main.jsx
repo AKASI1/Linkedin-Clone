@@ -1,22 +1,82 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import styled from "styled-components";
 import PostModel from "./PostModel";
-import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
-import { db } from "../firebase";
+import {
+  addDoc,
+  collection,
+  onSnapshot,
+  orderBy,
+  query,
+  Timestamp,
+} from "firebase/firestore";
+import { db, storage } from "../firebase";
 import ReactPlayer from "react-player";
 import fuzzyTime from "fuzzy-time";
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import Comment from "./Comment";
 
 /*________________________________________________________________________________*/
 
-const Main = (props) => {
+const Main = () => {
   const user = useSelector((state) => state.user.value);
   const [posts, setPosts] = useState([]);
   const [showModel, setShowModel] = useState(false);
+  const [showComments, setShowComments] = useState([]);
+  const [load, setLoad] = useState("");
 
   const hideModel = () => {
     setShowModel(false);
   };
+
+  const uploadPost = useCallback(
+    (post) => {
+      // Upload File.
+      const storageRef = ref(
+        storage,
+        post.image ? `images/${post.image.name}` : `vedios/${post.vedio.name}`
+      );
+      const upload = uploadBytesResumable(
+        storageRef,
+        post.image ? post.image : post.vedio
+      );
+
+      // Listen for state changes, errors, and completion.
+      upload.on(
+        "state_changed",
+        (snapshot) => {
+          console.log(snapshot);
+          const progress =
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          setLoad(progress);
+          if (snapshot.state === "RUNNING") {
+            setLoad(progress);
+          }
+        },
+        (error) => {
+          console.log(error.code);
+        },
+        async () => {
+          const url = await getDownloadURL(upload.snapshot.ref);
+          // Add to DataBase
+          await addDoc(collection(db, "Articles"), {
+            user: {
+              name: user.displayName,
+              title: user.email,
+              photo: user.photoURL,
+            },
+            date: Timestamp.now(),
+            sharedImage: post.image ? url : "",
+            sharedVedio: post.vedio ? url : "",
+            description: post.text,
+            comments: [],
+          });
+          setLoad();
+        }
+      );
+    },
+    [user]
+  );
 
   useEffect(() => {
     const getPosts = async () => {
@@ -27,15 +87,15 @@ const Main = (props) => {
       onSnapshot(q, (querySnapshot) => {
         let arr = [];
         querySnapshot.forEach((doc) => {
-          arr.push(doc.data());
+          arr.push({ post: doc.data(), postID: doc.id });
         });
 
         setPosts(arr);
       });
     };
     getPosts();
-  }, []);
-  console.log(posts);
+  }, [uploadPost]);
+
   return (
     <Container>
       <ShareBox>
@@ -69,8 +129,26 @@ const Main = (props) => {
           </button>
         </div>
       </ShareBox>
+
+      {load && (
+        <UploadingBox>
+          <img src="/Images/vedio.svg" alt="vedio" />
+          <div className="info">
+            <span>Uploading...</span>
+            <div className="progress">
+              <span>0</span>
+              <div className="bar">
+                <span style={{ width: load + "%" }} width={"50%"}></span>
+              </div>
+              <span>100</span>
+            </div>
+          </div>
+          <img src="/Images/ellipsis.svg" alt="ellipsis" />
+        </UploadingBox>
+      )}
+
       {posts.length > 0 &&
-        posts.map((post, id) => (
+        posts.map(({ post, postID }, id) => (
           <Article key={id}>
             <Actor>
               <a href="/feed">
@@ -96,7 +174,6 @@ const Main = (props) => {
                 />
               )}
             </SharedImg>
-
             <SocialContents>
               <li>
                 <img
@@ -113,8 +190,8 @@ const Main = (props) => {
                 />
                 <span>42</span>
               </li>
-              <li>
-                <p>{post.comments} comments </p>
+              <li onClick={() => setShowComments((prev) => [...prev, id])}>
+                <p>{post.comments ? post.comments.length : 0} comments </p>
               </li>
             </SocialContents>
             <SocialActions>
@@ -132,7 +209,7 @@ const Main = (props) => {
 
                 <span>Like</span>
               </button>
-              <button>
+              <button onClick={() => setShowComments((prev) => [...prev, id])}>
                 <img src="/Images/comment.svg" alt="comment" />
                 <span>Comment</span>
               </button>
@@ -145,9 +222,23 @@ const Main = (props) => {
                 <span>Send</span>
               </button>
             </SocialActions>
+            {showComments.includes(id) && (
+              <Comment
+                photo={user?.photoURL}
+                comments={post.comments}
+                user={user}
+                postID={postID}
+              />
+            )}
           </Article>
         ))}
-      {showModel && <PostModel close={hideModel} addPost={setPosts} />}
+      {showModel && (
+        <PostModel
+          close={hideModel}
+          addPost={setPosts}
+          uploadPost={uploadPost}
+        />
+      )}
     </Container>
   );
 };
@@ -167,6 +258,42 @@ const CommonCard = styled.article`
   border: none;
   position: relative;
   box-shadow: 0 0 0 1px rgb(0 0 0 / 15%), 0 0 0 rgb(0 0 0 / 20%);
+`;
+/*_________________________________________*/
+const UploadingBox = styled(CommonCard)`
+  text-align: start;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 16px;
+  color: rgba(0, 0, 0, 0.7);
+  position: relative;
+  & > img {
+    width: fit-content;
+  }
+  .progress {
+    margin-top: 5px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 400px;
+    .bar {
+      width: 100%;
+      height: 8px;
+      border-radius: 10px;
+      background-color: rgba(0, 0, 0, 0.08);
+      overflow: hidden;
+      position: relative;
+      span {
+        position: absolute;
+        height: 100%;
+        background-color: #576779;
+      }
+    }
+    @media (max-width: 768px) {
+      width: 230px;
+    }
+  }
 `;
 /*_________________________________________*/
 const ShareBox = styled(CommonCard)`

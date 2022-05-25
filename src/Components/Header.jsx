@@ -92,7 +92,6 @@ const Container = styled.div`
   top: 0;
   width: 100vw;
   z-index: 100;
-  box-shadow: 0 0 0 1px rgb(0 0 0 / 15%), 0 6px 9px rgb(0 0 0 / 20%);
 `;
 /*___________________________________________________*/
 const Content = styled.div`
