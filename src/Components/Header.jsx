@@ -54,7 +54,7 @@ const Header = (props) => {
               <span>Notifications</span>
             </NavList>
 
-            <User onClick={() => setShowUser(!showUser)}>
+            <User className="user" onClick={() => setShowUser(!showUser)}>
               {user && user.photoURL ? (
                 <img src={user.photoURL} alt="user" />
               ) : (
@@ -241,6 +241,13 @@ const User = styled(NavList)`
   }
   @media (max-width: 767px) {
     display: none;
+    &.user {
+      display: inline-block;
+      position: fixed;
+      top: 6px;
+      right: 5px;
+      min-width: 35px;
+    }
   }
 `;
 
