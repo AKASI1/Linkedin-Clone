@@ -42,7 +42,7 @@ const PostModel = (props) => {
           sharedImage: "",
           sharedVedio: textURL ? text : "",
           description: text,
-          comments: 0,
+          comments: [],
         });
       }
       reset();

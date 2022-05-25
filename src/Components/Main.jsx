@@ -14,6 +14,7 @@ import { db, storage } from "../firebase";
 import ReactPlayer from "react-player";
 import fuzzyTime from "fuzzy-time";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import Comment from "./Comment";
 
 /*________________________________________________________________________________*/
 
@@ -21,8 +22,8 @@ const Main = () => {
   const user = useSelector((state) => state.user.value);
   const [posts, setPosts] = useState([]);
   const [showModel, setShowModel] = useState(false);
+  const [showComments, setShowComments] = useState([]);
   const [load, setLoad] = useState("");
-  console.log(load);
 
   const hideModel = () => {
     setShowModel(false);
@@ -68,7 +69,7 @@ const Main = () => {
             sharedImage: post.image ? url : "",
             sharedVedio: post.vedio ? url : "",
             description: post.text,
-            comments: 0,
+            comments: [],
           });
           setLoad();
         }
@@ -86,7 +87,7 @@ const Main = () => {
       onSnapshot(q, (querySnapshot) => {
         let arr = [];
         querySnapshot.forEach((doc) => {
-          arr.push(doc.data());
+          arr.push({ post: doc.data(), postID: doc.id });
         });
 
         setPosts(arr);
@@ -147,7 +148,7 @@ const Main = () => {
       )}
 
       {posts.length > 0 &&
-        posts.map((post, id) => (
+        posts.map(({ post, postID }, id) => (
           <Article key={id}>
             <Actor>
               <a href="/feed">
@@ -173,7 +174,6 @@ const Main = () => {
                 />
               )}
             </SharedImg>
-
             <SocialContents>
               <li>
                 <img
@@ -190,8 +190,8 @@ const Main = () => {
                 />
                 <span>42</span>
               </li>
-              <li>
-                <p>{post.comments} comments </p>
+              <li onClick={() => setShowComments((prev) => [...prev, id])}>
+                <p>{post.comments ? post.comments.length : 0} comments </p>
               </li>
             </SocialContents>
             <SocialActions>
@@ -209,7 +209,7 @@ const Main = () => {
 
                 <span>Like</span>
               </button>
-              <button>
+              <button onClick={() => setShowComments((prev) => [...prev, id])}>
                 <img src="/Images/comment.svg" alt="comment" />
                 <span>Comment</span>
               </button>
@@ -222,6 +222,14 @@ const Main = () => {
                 <span>Send</span>
               </button>
             </SocialActions>
+            {showComments.includes(id) && (
+              <Comment
+                photo={user?.photoURL}
+                comments={post.comments}
+                user={user}
+                postID={postID}
+              />
+            )}
           </Article>
         ))}
       {showModel && (
