@@ -43,6 +43,7 @@ const PostModel = (props) => {
           sharedVedio: textURL ? text : "",
           description: text,
           comments: [],
+          likes: [],
         });
       }
       reset();

@@ -5,10 +5,12 @@ import PostModel from "./PostModel";
 import {
   addDoc,
   collection,
+  doc,
   onSnapshot,
   orderBy,
   query,
   Timestamp,
+  updateDoc,
 } from "firebase/firestore";
 import { db, storage } from "../firebase";
 import ReactPlayer from "react-player";
@@ -70,6 +72,7 @@ const Main = () => {
             sharedVedio: post.vedio ? url : "",
             description: post.text,
             comments: [],
+            likes: [],
           });
           setLoad();
         }
@@ -95,6 +98,18 @@ const Main = () => {
     };
     getPosts();
   }, [uploadPost]);
+
+  // Implent Like and unLike
+  const fetchLikes = (postId, likes) => {
+    updateDoc(doc(db, "Articles", postId), {
+      likes: likes.some((l) => l.email === user.email)
+        ? likes.filter((l) => l.email !== user.email)
+        : [
+            { name: user.displayName, email: user.email, photo: user.photoURL },
+            ...likes,
+          ],
+    });
+  };
 
   return (
     <Container>
@@ -176,19 +191,13 @@ const Main = () => {
             </SharedImg>
             <SocialContents>
               <li>
-                <img
-                  src="https://static-exp1.licdn.com/sc/h/8ekq8gho1ruaf8i7f86vd1ftt"
-                  alt="likes"
-                />
-                <img
-                  src="https://static-exp1.licdn.com/sc/h/b1dl5jk88euc7e9ri50xy5qo8"
-                  alt="clap"
-                />
-                <img
-                  src="https://static-exp1.licdn.com/sc/h/cpho5fghnpme8epox8rdcds22"
-                  alt="love"
-                />
-                <span>42</span>
+                {post.likes.length > 0 && (
+                  <img
+                    src="https://static-exp1.licdn.com/sc/h/8ekq8gho1ruaf8i7f86vd1ftt"
+                    alt="likes"
+                  />
+                )}
+                <span>{post.likes.length}</span>
               </li>
               <li onClick={() => setShowComments((prev) => [...prev, id])}>
                 <p>{post.comments ? post.comments.length : 0} comments </p>
@@ -196,8 +205,11 @@ const Main = () => {
             </SocialContents>
             <SocialActions>
               <button
+                className={
+                  post.likes.some((l) => l.email === user.email) ? "active" : ""
+                }
                 onClick={(e) => {
-                  e.currentTarget.classList.toggle("active");
+                  fetchLikes(postID, post.likes);
                 }}
               >
                 <img className="unLiked" src="/Images/like.svg" alt="like" />
