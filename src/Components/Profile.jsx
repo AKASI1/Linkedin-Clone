@@ -2,16 +2,19 @@ import styled from "styled-components";
 import { useDispatch, useSelector } from "react-redux";
 import { signOut } from "../App/user-slice";
 import { auth } from "../firebase";
+import { useNavigate } from "react-router-dom";
 
 /*________________________________________________________________________________*/
 
 const Profile = () => {
+  const navigate = useNavigate();
   const user = useSelector((state) => state.user.value);
   const dispatch = useDispatch();
 
   const signOutHandler = async () => {
     await auth.signOut();
     dispatch(signOut());
+    navigate("/");
   };
 
   return (
@@ -46,7 +49,7 @@ export default Profile;
 const Container = styled.article`
   position: absolute;
   top: 60px;
-  right: 0;
+  right: 3px;
   width: fit-content;
   width: 270px;
   padding: 0;

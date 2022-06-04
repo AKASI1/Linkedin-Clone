@@ -59,6 +59,7 @@ const Nav = styled.nav`
     height: 34px;
     @media (max-width: 767px) {
       padding: 0 5px;
+      width: 120px;
     }
   }
   /*___________________________________*/
@@ -97,15 +98,16 @@ const Section = styled.section`
   position: relative;
   display: flex;
   align-content: start;
-  min-height: 700px;
+  min-height: 500px;
   padding-bottom: 138px;
   padding-top: 40px;
-  padding: 60px 0;
+  padding: 100px 0;
   flex-wrap: wrap;
   width: 100%;
   max-width: 1128px;
   align-items: center;
   margin: auto;
+  top: 80px;
   @media (max-width: 767px) {
     min-height: 0px;
   }
@@ -129,12 +131,12 @@ const Hero = styled.div`
   }
   img {
     width: 700px;
-    height: 670px;
+    height: 500px;
     position: absolute;
     top: 0px;
     right: -200px;
     @media (max-width: 767px) {
-      top: 10px;
+      top: 180px;
       right: 50%;
       transform: translateX(50%);
       width: 270px;
@@ -164,7 +166,7 @@ const Form = styled.div`
     transition: 0.2s;
     font-size: 20px;
     color: rgba(0, 0, 0, 0.6);
-    background-color: #f5f5f5;
+    background-color: white;
     cursor: pointer;
     &:hover {
       background-color: rgba(207, 207, 207, 0.25);

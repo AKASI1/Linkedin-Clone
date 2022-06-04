@@ -24,6 +24,7 @@ export default Home;
 const Container = styled.div`
   padding-top: 52px;
   max-width: 100%;
+  background-color: #f5f5f5;
 `;
 /*__________________________________________*/
 

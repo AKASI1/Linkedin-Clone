@@ -5,6 +5,7 @@ import PostModel from "./PostModel";
 import {
   addDoc,
   collection,
+  deleteDoc,
   doc,
   onSnapshot,
   orderBy,
@@ -25,6 +26,7 @@ const Main = () => {
   const [posts, setPosts] = useState([]);
   const [showModel, setShowModel] = useState(false);
   const [showComments, setShowComments] = useState([]);
+  const [showEditPost, setShowEditPost] = useState(false);
   const [load, setLoad] = useState("");
 
   const hideModel = () => {
@@ -111,6 +113,11 @@ const Main = () => {
     });
   };
 
+  // Delete Post
+  const deletePost = (postID) => {
+    deleteDoc(doc(db, "Articles", postID));
+  };
+
   return (
     <Container>
       <ShareBox>
@@ -174,9 +181,30 @@ const Main = () => {
                   <span className="date">{fuzzyTime(post.date.toDate())}</span>
                 </div>
               </a>
-              <button>
+              <button
+                onClick={() =>
+                  setShowEditPost((prev) => (prev === postID ? null : postID))
+                }
+              >
                 <img src="/Images/ellipsis.svg" alt="ellipsis" />
               </button>
+              {showEditPost === postID && (
+                <EditModel>
+                  <li>
+                    <img src="/Images/firebase.png" alt="saved" />
+                    <div className="info">
+                      <h6>Save</h6>
+                      <span>Save for later</span>
+                    </div>
+                  </li>
+                  {post.user.title === user.email && (
+                    <li onClick={() => deletePost(postID)}>
+                      <img src="/Images/delete.svg" alt="" />
+                      <h6>Delete post</h6>
+                    </li>
+                  )}
+                </EditModel>
+              )}
             </Actor>
             <Description>{post.description}</Description>
             <SharedImg>
@@ -381,7 +409,7 @@ const Actor = styled.div`
   justify-content: space-between;
   margin-bottom: 8px;
   align-items: flex-start;
-
+  position: relative;
   a {
     overflow: hidden;
     display: flex;
@@ -410,7 +438,54 @@ const Actor = styled.div`
     background-color: transparent;
     border: none;
     cursor: pointer;
-    padding: 0;
+    padding: 5px;
+    border-radius: 50px;
+
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.08);
+    }
+  }
+`;
+/*_________________________________________*/
+const EditModel = styled.ul`
+  animation: fadeIn 0.5s;
+  text-align: start;
+  position: absolute;
+  right: 5px;
+  top: 55px;
+  background-color: white;
+  box-shadow: 0 0 0 1px rgb(0 0 0 / 15%), 0 6px 9px rgb(0 0 0 / 20%);
+  border-radius: 8px;
+  overflow: hidden;
+  z-index: 99;
+  min-width: 250px;
+  li {
+    display: flex;
+    padding: 10px;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.08);
+    }
+    img {
+      width: 18px;
+      height: 20px;
+    }
+    h6 {
+      font-size: 14px;
+      color: rgba(0, 0, 0, 1);
+      font-weight: 600;
+    }
+    .info {
+      text-align: start;
+      span {
+        font-size: 12px;
+        display: block;
+        color: rgba(0, 0, 0, 0.6);
+      }
+    }
   }
 `;
 /*_________________________________________*/

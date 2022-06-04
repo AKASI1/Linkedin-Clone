@@ -133,7 +133,13 @@ const Search = styled.div`
       height: 34px;
       border-color: #dce6f1;
       vertical-align: text-top;
+      @media (max-width: 767px) {
+        width: 205px;
+      }
     }
+  }
+  @media (max-width: 365px) {
+    margin-left: 25px;
   }
 `;
 /*___________________________________________________*/
@@ -211,6 +217,7 @@ const NavList = styled.li`
   }
   @media (max-width: 768px) {
     min-width: 70px;
+    font-size: 10.5px;
   }
 
   &:hover,
@@ -240,7 +247,9 @@ const User = styled(NavList)`
     height: fit-content;
   }
   @media (max-width: 767px) {
-    display: none;
+    position: fixed;
+    top: 5px;
+    right: 0px;
   }
 `;
 
@@ -249,6 +258,9 @@ const Work = styled(User)`
   img:last-child {
     width: fit-content;
     height: fit-content;
+  }
+  @media (max-width: 767px) {
+    display: none;
   }
 `;
 /*________________________________________________________________________________*/
