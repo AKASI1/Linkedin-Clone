@@ -110,6 +110,7 @@ const Section = styled.section`
   top: 80px;
   @media (max-width: 767px) {
     min-height: 0px;
+    top: 0;
   }
 `;
 /*__________________________________________*/
